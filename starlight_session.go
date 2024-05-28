@@ -36,6 +36,16 @@ func (g *starlightSessionPool) GetSession(id uint64) (*starlightSession, bool) {
 	return sess, ok
 }
 
+type sessionState uint16
+
+const (
+	sessionUnknown sessionState = iota
+	sessionEstablished
+)
+
 type starlightSession struct {
 	ID uint64
+
+	State         sessionState
+	PacketCounter uint32
 }

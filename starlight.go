@@ -14,10 +14,10 @@ import (
 const PROTOCOL_VERSION = 1
 
 type StarlightConfig struct {
-	AllowPoll          bool // poll01
-	AllowLongPoll      bool // lpll01
-	AllowHTTPStreaming bool // ress01
-	AllowWebsocket     bool // webs01
+	AllowPoll      bool // poll01
+	AllowLongPoll  bool // lpll01
+	AllowSSE       bool // hsse01
+	AllowWebsocket bool // webs01
 
 	SessionTimeout       time.Duration
 	LongPollTimeout      time.Duration
@@ -31,10 +31,10 @@ type StarlightConfig struct {
 
 func defaultConfig() *StarlightConfig {
 	return &StarlightConfig{
-		AllowPoll:          true,
-		AllowLongPoll:      true,
-		AllowHTTPStreaming: true,
-		AllowWebsocket:     true,
+		AllowPoll:      true,
+		AllowLongPoll:  true,
+		AllowSSE:       true,
+		AllowWebsocket: true,
 
 		SessionTimeout:       time.Second * 15,
 		LongPollTimeout:      time.Second * 10,
@@ -56,9 +56,9 @@ func WithAllowLongPoll(allow bool) StarlightOption {
 	}
 }
 
-func WithAllowHTTPStreaming(allow bool) StarlightOption {
+func WithAllowSSE(allow bool) StarlightOption {
 	return func(c *StarlightConfig) {
-		c.AllowHTTPStreaming = allow
+		c.AllowSSE = allow
 	}
 }
 
@@ -141,14 +141,14 @@ var NotFoundHandler = http.HandlerFunc(handleNotFound)
 type Protocol string
 
 const (
-	q_key                         = "starlight"
-	q_key_directory               = "directory"
-	q_key_http_response_streaming = "f2ace8d571ac98ae" // ress01
-	q_key_websocket               = "ee99a57a33ec9ca2" // webs01
-	q_key_long_polling            = "e14abc88cb6c5dcb" // lpll01
-	q_key_polling                 = "c29bb1b250b6d522" // poll01
+	q_key              = "starlight"
+	q_key_directory    = "directory"
+	q_key_http_sse     = "f2ace8d571ac98ae" // hsse01
+	q_key_websocket    = "ee99a57a33ec9ca2" // webs01
+	q_key_long_polling = "e14abc88cb6c5dcb" // lpll01
+	q_key_polling      = "c29bb1b250b6d522" // poll01
 
-	PROTOCOL_ress01 Protocol = "ress01"
+	PROTOCOL_hsse01 Protocol = "hsse01"
 	PROTOCOL_webs01 Protocol = "webs01"
 	PROTOCOL_lpll01 Protocol = "lpll01"
 	PROTOCOL_poll01 Protocol = "poll01"
@@ -158,7 +158,7 @@ func (g *Starlight) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Query().Get(q_key) {
 	case q_key_directory:
 		g.directoryHandler(w, r)
-	case q_key_http_response_streaming:
+	case q_key_http_sse:
 		// s.httpResponseStreamingHandler(w, r)
 	case q_key_websocket:
 		// s.websocketHandler(w, r)
@@ -205,10 +205,10 @@ func (g *Starlight) buildDirectoryResponse() {
 			Protocol: PROTOCOL_lpll01,
 			Key:      q_key_long_polling,
 		})
-	case g._config.AllowHTTPStreaming:
+	case g._config.AllowSSE:
 		protocols = append(protocols, directoryResponseProtocol{
-			Protocol: PROTOCOL_ress01,
-			Key:      q_key_http_response_streaming,
+			Protocol: PROTOCOL_hsse01,
+			Key:      q_key_http_sse,
 		})
 	case g._config.AllowWebsocket:
 		protocols = append(protocols, directoryResponseProtocol{
