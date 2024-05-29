@@ -36,11 +36,13 @@ func (g *starlightSessionPool) GetSession(id uint64) (*starlightSession, bool) {
 	return sess, ok
 }
 
-type sessionState uint16
+//go:generate stringer -type=sessionState -linecomment
+type sessionState uint32
 
 const (
-	sessionUnknown sessionState = iota
-	sessionEstablished
+	sessionUnknown     sessionState = iota // unknown
+	sessionEstablished                     // established
+	sessionClosed                          // closed
 )
 
 type starlightSession struct {

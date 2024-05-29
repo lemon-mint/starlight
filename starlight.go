@@ -138,20 +138,21 @@ func handleNotFound(w http.ResponseWriter, _ *http.Request) {
 
 var NotFoundHandler = http.HandlerFunc(handleNotFound)
 
-type Protocol string
+//go:generate stringer -type=Protocol -linecomment
+type Protocol uint16
 
 const (
 	q_key              = "starlight"
 	q_key_directory    = "directory"
+	q_key_polling      = "c29bb1b250b6d522" // poll01
+	q_key_long_polling = "e14abc88cb6c5dcb" // lpll01
 	q_key_http_sse     = "f2ace8d571ac98ae" // hsse01
 	q_key_websocket    = "ee99a57a33ec9ca2" // webs01
-	q_key_long_polling = "e14abc88cb6c5dcb" // lpll01
-	q_key_polling      = "c29bb1b250b6d522" // poll01
 
-	PROTOCOL_hsse01 Protocol = "hsse01"
-	PROTOCOL_webs01 Protocol = "webs01"
-	PROTOCOL_lpll01 Protocol = "lpll01"
-	PROTOCOL_poll01 Protocol = "poll01"
+	PROTOCOL_poll01 Protocol = 10 // poll01
+	PROTOCOL_lpll01 Protocol = 11 // lpll01
+	PROTOCOL_hsse01 Protocol = 12 // hsse01
+	PROTOCOL_webs01 Protocol = 13 // webs01
 )
 
 func (g *Starlight) ServeHTTP(w http.ResponseWriter, r *http.Request) {

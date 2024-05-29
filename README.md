@@ -1,3 +1,3 @@
 # Starlight
 
-Full-duplex realtime web protocol
+Full-duplex real-time web protocol
